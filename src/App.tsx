@@ -1,24 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from 'react';
+import './App.scss';
+import Su from './components/Su'
+import RenderProps from './components/RenderProps';
+import Tree from './components/Tree/Tree'
 
-function App() {
+function App(): JSX.Element {
+  useEffect(() => {
+
+  }, [])
+
+    // 夜间模式
+    const  switchingMode =()=>{
+        document.querySelector('html')?.classList.toggle('night-root')
+    }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1 className='text-4xl bg-cyan  aaa text-center font-semibold'>1111</h1>
+      <button onClick={switchingMode}>夜间模式切换</button>
+      <Su />
+      <Tree />
+      <hr />
+      RenderProps
+      <RenderProps />
     </div>
   );
 }

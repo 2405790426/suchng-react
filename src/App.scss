@@ -1,6 +1,27 @@
-.App {
-  text-align: center;
+
+:root{
+  --main-daytime-bgc:#fff;
+  --main-text:black;
 }
+
+.night-root{
+  --main-daytime-bgc:black;
+  --main-text:#fff;
+}
+
+
+.App {
+  color:var(--main-text);
+  text-align: center;
+  background-color: var(--main-daytime-bgc);
+  button{
+    color:var(--main-text);
+    background-color: var(--main-daytime-bgc);
+    border:1px solid var(--main-text);
+  }
+
+}
+
 
 .App-logo {
   height: 40vmin;
@@ -36,3 +57,4 @@
     transform: rotate(360deg);
   }
 }
+
