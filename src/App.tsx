@@ -6,7 +6,9 @@ import Tree from "./components/Tree/Tree";
 import TextExpanded from "./components/TextExpanded";
 
 function App(): JSX.Element {
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log("测试1");
+  }, []);
 
   // 夜间模式
   const switchingMode = () => {
