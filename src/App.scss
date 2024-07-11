@@ -11,6 +11,7 @@
 
 
 .App {
+  font-size: 16px;
   color:var(--main-text);
   text-align: center;
   background-color: var(--main-daytime-bgc);
@@ -56,5 +57,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.su{
+  font-size: 30px;
 }
 

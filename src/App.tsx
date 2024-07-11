@@ -21,7 +21,7 @@ function App(): JSX.Element {
       <Su />
       <Tree />
       <hr />
-      RenderProps
+      <div className="su">RenderProps</div>
       <RenderProps />
       <TextExpanded />
     </div>
