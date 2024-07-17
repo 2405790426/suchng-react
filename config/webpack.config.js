@@ -28,6 +28,8 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 
 const createEnvironmentHash = require('./webpack/persistentCache/createEnvironmentHash');
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 
@@ -261,6 +263,30 @@ module.exports = function (webpackEnv) {
       level: 'none',
     },
     optimization: {
+      splitChunks:{
+        chunks: 'all',
+        cacheGroups: {
+          // cacheGroups 下可以可以配置多个组，每个组根据test设置条件，符合test条件的模块
+          commons: {
+            name: 'chunk-commons',
+            test: resolve('src/components'),
+            minChunks: 3, //  被至少用三次以上打包分离
+            priority: 5, // 优先级
+            reuseExistingChunk: true // 表示是否使用已有的 chunk，如果为 true 则表示如果当前的 chunk 包含的模块已经被抽取出去了，那么将不会重新生成新的。
+          },
+          node_vendors: {
+            name: 'chunk-libs',
+            chunks: 'initial', // 只打包初始时依赖的第三方
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10
+          },
+          // vantUI: {
+          //   name: 'chunk-vantUI', // 单独将 vantUI 拆包
+          //   priority: 20, // 数字大权重到，满足多个 cacheGroups 的条件时候分到权重高的
+          //   test: /[\\/]node_modules[\\/]_?vant(.*)/
+          // }
+        }
+      },
       minimize: isEnvProduction,
       minimizer: [
         // This is only used in production mode
@@ -578,6 +604,7 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
+      new BundleAnalyzerPlugin(),
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(
