@@ -4,6 +4,7 @@ import Su from "./components/Su";
 import RenderProps from "./components/RenderProps";
 import Tree from "./components/Tree/Tree";
 import TextExpanded from "./components/TextExpanded";
+import { useHistory } from "react-router-dom";
 
 function App(): JSX.Element {
   useEffect(() => {

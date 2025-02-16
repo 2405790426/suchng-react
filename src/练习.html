@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1" />
+    <title>Document</title>
+    <style>
+        [theme='dark'] {
+            background-color: black;
+            color: #fff
+        }
+
+        .big-box {
+            width: 100%;
+            height: 2000px;
+        }
+
+        .a {
+            width: 100%;
+            height: 200px;
+            background-color: #464b89;
+            margin-bottom: 30px;
+        }
+
+        button {
+            margin: 20px;
+        }
+
+        .daBox {
+            height: 40px;
+            overflow: auto;
+        }
+
+        .watermark-wrapper {
+            width: 100%;
+            height: 2000px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="watermark-wrapper" class="watermark-wrapper">
+        <div class="su"></div>
+        <div class="big-box">
+            <div class="daBox"><button id="b">跳转</button></div>
+            <input type="file" id="file" name="myfiles[]" multiple />
+            <input id="inputa" />
+            <div class="a a1">a1</div>
+            <div class="a a2">a2</div>
+            <div class="a a3">a3</div>
+            <div class="a a4">a4</div>
+            <div class="a a5">a5</div>
+            <div class="a a6">a6</div>
+            <div class="a a7">a7</div>
+        </div>
+    </div>
+    <div id="app">{{ message }}
+        <button @click="message = '777'">6666</button>
+    </div>
+</body>
+<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="lodash.js"></script>
+<!-- // 水印 -->
+<script>
+
+    $(document).ready(function () {
+        var watermark_txt = "苏成专用" + getDate();
+        watermark({
+            watermarl_element: "watermark-wrapper",
+            watermark_txt: watermark_txt,
+        });
+    });
+    function watermark(settings) {
+        //默认设置
+        var defaultSettings = {
+            watermarl_element: "body",
+            watermark_txt: "",
+            watermark_x: 10, //水印起始位置x轴坐标
+            watermark_y: 10, //水印起始位置Y轴坐标
+            watermark_rows: 2000, //水印行数
+            watermark_cols: 2000, //水印列数
+            watermark_x_space: 50, //水印x轴间隔
+            watermark_y_space: 50, //水印y轴间隔
+            watermark_color: "#d7d7d7", //水印字体颜色
+            watermark_alpha: 0.23, //水印透明度
+            watermark_fontsize: "15px", //水印字体大小
+            watermark_font: "微软雅黑", //水印字体
+            watermark_width: 300, //水印宽度
+            watermark_height: 50, //水印长度
+            watermark_angle: 15, //水印倾斜度数
+        };
+        //采用配置项替换默认值，作用类似jquery.extend
+        if (arguments.length === 1 && typeof arguments[0] === "object") {
+            var src = arguments[0] || {};
+            for (key in src) {
+                if (
+                    src[key] &&
+                    defaultSettings[key] &&
+                    src[key] === defaultSettings[key]
+                ) {
+                    continue;
+                } else if (src[key]) {
+                    defaultSettings[key] = src[key];
+                }
+            }
+        }
+
+        var oTemp = document.createDocumentFragment();
+
+        var maskElement =
+            document.getElementById(defaultSettings.watermarl_element) ||
+            document.body;
+        //获取页面最大宽度
+        var page_width =
+            Math.max(maskElement.scrollWidth, maskElement.clientWidth) / 2; //要多宽
+        //获取页面最大高度
+        var page_height = Math.max(
+            maskElement.scrollHeight,
+            maskElement.clientHeight,
+            maskElement.scrollTop
+        );
+        console.log(page_width, page_height);
+        //水印数量自适应元素区域尺寸
+        defaultSettings.watermark_cols = Math.ceil(
+            page_width /
+            (defaultSettings.watermark_x_space + defaultSettings.watermark_width)
+        );
+        defaultSettings.watermark_rows = Math.ceil(
+            page_height /
+            (defaultSettings.watermark_y_space + defaultSettings.watermark_height)
+        );
+        var x;
+        var y;
+        for (var i = 0; i < defaultSettings.watermark_rows; i++) {
+            y =
+                defaultSettings.watermark_y +
+                (defaultSettings.watermark_y_space +
+                    defaultSettings.watermark_height) *
+                i;
+            for (var j = 0; j < defaultSettings.watermark_cols; j++) {
+                x =
+                    defaultSettings.watermark_x +
+                    (defaultSettings.watermark_width +
+                        defaultSettings.watermark_x_space) *
+                    j;
+                var mask_div = document.createElement("div");
+                mask_div.id = "mask_div" + i + j;
+                mask_div.className = "mask_div";
+                //mask_div.appendChild(document.createTextNode(defaultSettings.watermark_txt));
+                mask_div.innerHTML = defaultSettings.watermark_txt;
+                //设置水印div倾斜显示
+                mask_div.style.webkitTransform =
+                    "rotate(-" + defaultSettings.watermark_angle + "deg)";
+                mask_div.style.MozTransform =
+                    "rotate(-" + defaultSettings.watermark_angle + "deg)";
+                mask_div.style.msTransform =
+                    "rotate(-" + defaultSettings.watermark_angle + "deg)";
+                mask_div.style.OTransform =
+                    "rotate(-" + defaultSettings.watermark_angle + "deg)";
+                mask_div.style.transform =
+                    "rotate(-" + defaultSettings.watermark_angle + "deg)";
+                mask_div.style.visibility = "";
+                mask_div.style.position = "absolute";
+                mask_div.style.left = x + "px";
+                mask_div.style.top = y + "px";
+                mask_div.style.overflow = "hidden";
+                mask_div.style.zIndex = "1029"; // 9999
+                // pointer-events:none  让水印不遮挡页面的点击事件
+                mask_div.style.pointerEvents = "none";
+                // 设置边框
+                // mask_div.style.border="solid #eee 1px";
+                // 兼容IE9以下的透明度设置
+                mask_div.style.filter = "alpha(opacity=50)";
+                mask_div.style.opacity = defaultSettings.watermark_alpha;
+                mask_div.style.fontSize = defaultSettings.watermark_fontsize;
+                mask_div.style.fontFamily = defaultSettings.watermark_font;
+                mask_div.style.color = defaultSettings.watermark_color;
+                mask_div.style.textAlign = "center";
+                mask_div.style.width = defaultSettings.watermark_width + "px";
+                mask_div.style.height = defaultSettings.watermark_height + "px";
+                mask_div.style.display = "block";
+                oTemp.appendChild(mask_div);
+            }
+        }
+        maskElement.appendChild(oTemp);
+    }
+
+    function getDate() {
+        var d = new Date();
+        var year =
+            d.getFullYear() >= 10 ? d.getFullYear() : "0" + d.getFullYear();
+        var month =
+            d.getMonth() + 1 >= 10 ? d.getMonth() + 1 : "0" + (d.getMonth() + 1);
+        var day = d.getDate() >= 10 ? d.getDate() : "0" + d.getDate();
+        var hour = d.getHours() >= 10 ? d.getHours() : "0" + d.getHours();
+        var minute = d.getMinutes() >= 10 ? d.getMinutes() : "0" + d.getMinutes();
+        var second = d.getSeconds() >= 10 ? d.getSeconds() : "0" + d.getSeconds();
+        return (
+            year +
+            "-" +
+            month +
+            "-" +
+            day +
+            " " +
+            hour +
+            ":" +
+            minute +
+            ":" +
+            second
+        );
+    }
+</script>
+<script>
+    // 锚点
+    let dom = document.querySelector("#b");
+    let dom2 = document.querySelector(".daBox");
+    dom.onclick = function () {
+        console.log(dom2.scrollTop, dom2.scrollWidth, dom2.scrollLeft);
+        let newdom = document.querySelector(".a7");
+        if (newdom) {
+            newdom.style.display = "block";
+            newdom.scrollIntoView({ behavior: "smooth" });
+        }
+    };
+    // 二分法
+    function getIndex(arr, amount, start = 0, end = arr.length - 1) {
+        mid = Math.floor((start + end) / 2);
+        if (arr[mid] === amount) {
+            return mid;
+        } else if (arr[mid] > amount) {
+            end = mid - 1;
+            return getIndex(arr, amount, start, end);
+        } else if (arr[mid] < amount) {
+            start = mid + 1;
+            return getIndex(arr, amount, start, end);
+        } else {
+            return -1;
+        }
+    }
+    var arr = [1, 4, 7, 8, 12, 34, 67, 88, 99, 100];
+    console.log(getIndex(arr, 88));
+
+    // 发布订阅模式
+
+    // 发布订阅中心, on-订阅, off取消订阅, emit发布,
+    // 内部需要一个单独事件中心caches进行存储;
+    // interface CacheProps {
+    //     [key: string]: Array<(data?: unknown) => void>
+    // }
+
+    class Observer {
+        constructor() {
+            this.caches = {};
+        }
+        a = [1, 2, 3];
+        b = { su: "成" };
+        on(eventName, fn) {
+            // eventName事件名-独一无二, fn订阅后执行的自定义行为
+            this.caches[eventName] = this.caches[eventName] || [];
+            this.caches[eventName].push(fn);
+        }
+        emit(eventName, data) {
+            // 发布 => 将订阅的事件进行统一执行
+            if (this.caches[eventName]) {
+                this.caches[eventName].forEach((fn) => fn(data));
+            }
+        }
+        off(eventName, fn) {
+            // 取消订阅 => 若fn不传, 直接取消该事件所有订阅信息
+            if (this.caches[eventName]) {
+                const newCaches = fn
+                    ? this.caches[eventName].filter(
+                        (e) => e.toString() !== fn.toString()
+                    )
+                    : [];
+                console.log(newCaches);
+                this.caches[eventName] = newCaches;
+            }
+        }
+        sucheng() {
+            console.log(this.a, this.b);
+        }
+    }
+    const bus = new Observer();
+    bus.sucheng();
+    bus.on("test", (a) => {
+        console.log(a);
+    });
+    bus.on("test", (a) => {
+        console.log(a, 1);
+    });
+    bus.emit("test", "苏先生1");
+    bus.off("test", (a) => {
+        console.log(a);
+    });
+    bus.emit("test", "苏先生2");
+
+    // trycatch 捕获异步错误
+    {
+        const p = new Promise((reslove, reject) => {
+            setTimeout(() => {
+                reject(new Error("错误了=========="));
+            }, 1000);
+        });
+        async function errFn() {
+            try {
+                let a = await p;
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        errFn();
+    }
+
+    {
+        let obj = {
+            val: 0,
+            toString() {
+                return (this.val += 1);
+            },
+        };
+        console.log(obj == 1 && obj == 2 && obj == 3);
+        let arr = ["1", "速成", "dshd1", ""];
+        let newItem = arr.find((item) => item === "") ?? "你好";
+        console.log(newItem);
+    }
+    {
+        try {
+            Array(4, 5, 6, 7).forEach((item) => {
+                console.log(item);
+                if (item == 6) {
+                    throw new Error("foreach抛出错误");
+                }
+            });
+        } catch (error) {
+            console.log(error, "完成了");
+        }
+        // Array.prototype.forEach = function () {
+        //     console.log('重写了foreach方法===========1');
+        // }
+        // let arr = new Array(3, 2, 1)
+        // arr.forEach()
+        // arr.__proto__.forEach = function () {
+        //     console.log('重写了foreach方法===========2');
+        // }
+        // arr.forEach()
+    }
+    {
+        let arr = [];
+        let newArr = arr.map((item) => item.a.b);
+        console.log(newArr);
+
+        // JSON深拷贝无法转换undefined和函数
+        let obj = {
+            a: 111,
+            arr: [1, 2, 3],
+            c: null,
+            d: undefined,
+            e: function () {
+                console.log("函数");
+            },
+            f: new Date().getTime(),
+        };
+        let newObj = JSON.parse(JSON.stringify(obj));
+        newObj.arr.splice(1, 1);
+        console.log(obj, newObj);
+        for (let i = 0; i < obj.arr.length; i++) {
+            console.log(i);
+            if (i == 1) {
+                break;
+            }
+        }
+    }
+    {
+        console.log(Array.prototype);
+        let arr = [1, 2, 3, 4, 5];
+        arr.unshift(5);
+        arr.shift();
+        arr.pop();
+    }
+    {
+        let obj = {
+            a: 0,
+            b: {
+                c: undefined,
+            },
+        };
+
+        for (const key in obj) {
+            if (Object.hasOwnProperty.call(obj, key)) {
+                const element = obj[key];
+            }
+        }
+        const { a: su = [], b: { c = "cheng" } = {} } = obj;
+        console.log(su, c);
+
+        let arr = ["0a", "1b", "2c", "d"];
+        let newArr = arr.map((item) => {
+            if (isNaN(Number(item[0]))) {
+                item = "0" + item;
+            }
+            return Number(item[0]);
+        });
+        console.log(newArr);
+
+        const a = () => { };
+        console.log(a.constructor === Function);
+        localStorage.setItem("sucheng", "大帅哥");
+        console.log(localStorage.getItem("sucheng"));
+    }
+    {
+        console.log(
+            document.documentElement.clientHeight,
+            document.body.clientHeight
+        );
+        // 获取可视区域最大高度
+    }
+</script>
+
+<script>
+    // 防抖函数
+    let inputDom = document.querySelector("#inputa");
+    inputDom.oninput = debounce((e) => {
+        console.log("防抖666666======", e.target.value);
+    }, 1500);
+
+    function debounce(fn, delay = 200) {
+        let timer = 0;
+        return function () {
+            // 如果这个函数已经被触发了
+            if (timer) {
+                clearTimeout(timer);
+            }
+            timer = setTimeout(() => {
+                console.log(arguments[0].target.value);
+                fn.apply(this, arguments); // 透传 this和参数
+                timer = 0;
+            }, delay);
+        };
+    }
+
+    const init = async () => {
+        const p1 = new Promise((resolve, reject) => {
+            resolve('第一个参数')
+        })
+        const one = await p1
+        console.log(one);
+
+    }
+
+    function fangdou(callBack, delay) {
+        let times = 0;
+        return function () {
+            if (times) {
+                clearTimeout(times);
+            }
+            times = setTimeout(() => {
+                callBack.apply(this, arguments);
+                times = 0;
+            }, delay);
+        };
+    }
+    function jieliu(callBack, delay) {
+        let times = 0;
+        return function () {
+            if (!times) {
+                times = setTimeout(() => {
+                    callBack.apply(this, arguments);
+                    times = 0;
+                }, delay);
+            }
+        };
+    }
+
+
+    //实现一个bind
+    Function.prototype.mybind = function (externalThis) {
+        const _this = this //调用这个方法的函数
+
+        const arg = [...arguments].slice(1) //删除externalThis
+        return function () {
+            _this.apply(externalThis, [...arg, ...arguments])
+        }
+    }
+
+    const testBindObj = {
+        name: "小猪课堂",
+        age: 20
+    }
+    // 声明一个函数
+    function fn(a, b, c) {
+        console.log("函数内部this指向:", this);
+        console.log("参数列表:", a, b, c);
+    }
+    let newFn = fn.mybind(testBindObj, 10, 20);
+    newFn(30);
+
+    // 判断数组的方式
+    Array.isArray([])
+    Object.prototype.toString.call([]) === '[object Array]'
+    // [] instanceof Array
+    // [].__proto__ === Array.prototype
+    // [].constructor === Array
+
+</script>
+
+<script>
+
+    function getDeepestKeysAndValues(obj) {
+        let deepestKeysAndValues = {};
+        function traverse(obj) {
+            for (let key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    const value = obj[key];
+                    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                        traverse(value);
+                    } else {
+                        deepestKeysAndValues[key] = value;
+                    }
+                }
+            }
+        }
+        traverse(obj);
+        return deepestKeysAndValues;
+    }
+    const obj = JSON.parse('{"super_package_info.introduction":{"text":["一句话简介存在违规风险"],"audit_platform":["cqc"],"audit_ad_id":[]}}')
+    const deepestKeysAndValues = getDeepestKeysAndValues(obj)?.text?.join(';')
+    console.log(deepestKeysAndValues, 'deepestKeysAndValues');
+
+    const jk = (e) => {
+        let map = "abcdefghijklmnopqrstuvwxyz";
+        let res = "";
+        let index = e;
+        let su;
+        while (index > 0) {
+            index -= 1;
+            let a = index % 26;
+            su = ~~(index / 26);
+            res = `${map[su]}${map[a]},${res}`;
+        }
+        return res;
+    };
+    console.log(jk(500));
+
+    const html = "<b>Some HTML</b>";
+    let div = document.getElementsByClassName("su")[0];
+    console.log(div);
+    div.innerHTML = html;
+
+    const a = {
+        num: 0,
+        valueOf: () => ++this.num,
+    };
+    console.log(a == 1 && a == 2 && a == 3);
+
+    const { createApp } = Vue
+
+    createApp({
+        data() {
+            return {
+                message: 'Hello Vue!'
+            }
+        },
+        methods: {
+            aaa() {
+                console.log(666);
+            }
+        }
+    }).mount('#app')
+</script>
+
+</html>
