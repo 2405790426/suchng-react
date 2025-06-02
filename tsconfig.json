@@ -19,7 +19,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "noUnusedLocals":true,
+    "allowUnusedLabels": false, // 对于未使用的标签或变量警告，可以设置为 false 来忽略它们，但在项目中应尽量避免这么做。
+    "noUnusedLocals": false, // 禁用未使用局部变量的错误报告。
+    "noUnusedParameters": false // 禁用未使用参数的错误报告。
   },
   "include": [
     "src"

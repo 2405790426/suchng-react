@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+
+<script>
+
+    const arr = [...new Set([1, 1, 2, 3])]
+
+    const getMinMax = (arr) => {
+        let min = arr[0]
+        let max = arr[0]
+
+        arr.forEach((item => {
+            if (min > item) {
+                min = item
+            }
+            if (max < item) {
+                max = item
+            }
+        }))
+
+        return { min, max }
+    }
+
+    const getMostItem = (arr) => {
+        const obj = {}
+
+        arr.forEach((item) => {
+            if (obj[item]) {
+                obj[item]++
+            } else {
+                obj[item] = 1
+            }
+        })
+
+        const values = Object.values(obj)
+        const keys = Object.keys(obj)
+
+
+        const max = Math.max(...values)
+        const index = values.indexOf(max)
+
+        return keys[index]
+
+    }
+    console.log(getMostItem([1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 'su', 'su', 'su', 'su', 'su', 'su', 'su', 'su', 'su', 'su', 'su', 'su']));
+
+    arr.sort((a, b) => a - b)
+
+    const newFlatArr = arr.flat(Infinity)
+
+    const deepFlat = (arr) => {
+        return arr.reduce((pre, cur, index) => Array.isArray(cur) ? [...pre, ...deepFlat(cur)] : [...pre, cur], [])
+
+    }
+    console.log(deepFlat([1, 2, [3, 4, [5, 6]]]));
+
+    Function.prototype.myBind = function (context) {
+        const _this = this
+        const arg = [...arguments].slice(1)
+        return function () {
+            _this.apply(context, [...arg, ...arguments])
+        }
+
+    }
+
+
+    const sortArr = [100, 2, 4, 7, 9, 6, 54, 3, 4, 4, 5, 6, 7, 2, 0, 2]
+    
+    const bubbleSort = (list) => {
+        if (!list) {
+            return []
+        }
+        const arr = JSON.parse(JSON.stringify(list))
+        const length = arr.length
+        for (let index = 0; index < length; index++) {
+            for (let j = 0; j < length - index - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    const item = arr[j + 1]
+                    arr[j + 1] = arr[j]
+                    arr[j] = item
+                }
+
+            }
+        }
+        return arr
+
+    }
+
+    const sortA = (list) => {
+        if (!list || list.lenth === 0) {
+            return []
+        }
+        const arr = JSON.parse(JSON, stringify(list))
+        const length = arr.length
+
+        for (let i = 0; i < length; i++) {
+            for (let j = 0; j < length - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    const item = arr[j + 1]
+                    arr[j + 1] = arr[j]
+                    arr[j] = item
+                }
+            }
+        }
+        return arr
+    }
+
+    const sortB = (arr) => {
+        const length = list.length
+        if (!list || length === 0) {
+            return []
+        }
+        const middleIndex = Math.floor(length / 2)
+        const minddleValue = arr[middleIndex]
+        const left = []
+        const right = []
+
+        arr.forEach((item, index) => {
+            if (index !== middleIndex) {
+                if (item < minddleValue) {
+                    left.push(item)
+                } else {
+                    right.push(item)
+                }
+            }
+        })
+        return sortB(left).concat(minddleValue, sortB(right))
+    }
+
+    console.log(bubbleSort(sortArr), '冒泡法');
+
+    const quSort = (arr) => {
+        const length = arr.length
+        if (length === 0) {
+            return arr
+        }
+
+        const middleIndex = Math.floor(length / 2)
+        const middleValue = arr[middleIndex]
+
+
+        const left = []
+        const right = []
+
+        arr.forEach(((item, i) => {
+            if (i !== middleIndex) {
+                if (item < middleValue) {
+                    left.push(item)
+                } else {
+                    right.push(item)
+                }
+            }
+        }))
+        return quSort(left).concat(middleValue, quSort(right))
+    }
+
+    console.log(quSort(sortArr), '二分法');
+
+
+    const deepClone = (obj) => {
+        if (typeof obj !== 'object' || obj === null) {
+            return obj
+        }
+
+        let copy = {}
+
+        if (Array.isArray(obj)) {
+            copy = []
+        }
+
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                copy[key] = deepClone(obj[key])
+            }
+        }
+        return copy
+    }
+    console.log(deepClone({ a: { b: 123, c: { d: 567 } } }), '深拷贝');
+
+
+
+    const deepClonee = (obj) => {
+        if (typeOf !== 'object' || obj === null) {
+            return obj
+        }
+
+        let copy = {}
+
+        if (Array.isArray(obj)) {
+            copy = []
+        }
+
+        for (const key in object) {
+            if (object.hasOwnProperty(key)) {
+                copy[key] = deepClonee(obj[key])
+
+            }
+        }
+        return copy
+    }
+
+</script>
+
+</html>
